@@ -1,0 +1,21 @@
+root = data root?
+     = function root?
+data = DAT !VALUE
+function = #IDENT (W NUM)? L_PAREN param_list? R_PARAM L_BRACE body? R_BRACE
+param_list = param COMA param_list?
+param = IDENT W NUM
+body = line body?
+line = label
+     = instruction
+     = call
+label = IDENT COLON
+instruction = op v_list
+v_list = v v_list?
+v = !VALUE //immediate value
+  = $IDENT //some reg
+  = @IDENT //pointer in some reg
+  = &VALUE //immediate pointer
+  = :IDENT //label value
+call = #IDENT L_PAREN call_list? R_PAREN
+call_list = v COMA v?
+
