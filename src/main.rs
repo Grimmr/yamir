@@ -3,5 +3,5 @@ mod util;
 
 fn main()
 {
-    parser::lex::test();
+    println!("{:?}", parser::lex::lex(b"hello\n23 "));
 }

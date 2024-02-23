@@ -27,7 +27,7 @@ impl MsgLog
         MsgLog {msgs: Vec::new()}
     }
 
-    pub fn addMsg(&mut self, v:Msg)
+    pub fn add_msg(&mut self, v:Msg)
     {
         self.msgs.push(v);
     }

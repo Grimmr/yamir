@@ -5,7 +5,7 @@ use crate::util::error_log::{
 };
 
 #[derive(Debug)]
-enum TokenType
+pub enum TokenType
 {
     Dat,
     W,
@@ -26,7 +26,7 @@ enum TokenType
 }
 
 #[derive(Debug)]
-struct Token<'a>
+pub struct Token<'a>
 {
     typ:TokenType,
     lexeme:& 'a [u8],
@@ -55,28 +55,40 @@ impl<'a> LexMachine<'a>
         machine
     }
 
-    fn lex_next_token(& 'a mut self) -> &mut LexMachine
+    fn lex_all(&mut self) 
+    {
+        while self.to_lex.len() > 0
+        {
+            if !self.msgs.is_empty()
+            {
+                break;
+            }
+            self.lex_next_token();
+        }
+    }
+
+    fn lex_next_token(&mut self) 
     {
         if self.to_lex.len() == 0
         {
-            self.msgs.addMsg(Msg::new_from_lex_machine(MsgType::LexAttemptedToRunOffEndOfInput, self));
-            return self;
+            self.msgs.add_msg(Msg::new_from_lex_machine(MsgType::LexAttemptedToRunOffEndOfInput, self));
+            return;
         }
 
         //single char cases
         match self.to_lex[0]
         {
-            b'(' => { self.handle_token_creation(TokenType::LParen, 1); return self; },
-            b')' => { self.handle_token_creation(TokenType::RParen, 1); return self; },
-            b'{' => { self.handle_token_creation(TokenType::LBrace, 1); return self; },
-            b'}' => { self.handle_token_creation(TokenType::RBrace, 1); return self; },
-            b'#' => { self.handle_token_creation(TokenType::Hash, 1); return self; },
-            b',' => { self.handle_token_creation(TokenType::Coma, 1); return self; },
-            b':' => { self.handle_token_creation(TokenType::Colon, 1); return self; },
-            b'!' => { self.handle_token_creation(TokenType::Bang, 1); return self; },
-            b'@' => { self.handle_token_creation(TokenType::At, 1); return self; },
-            b'$' => { self.handle_token_creation(TokenType::Dollar, 1); return self; },
-            b'&' => { self.handle_token_creation(TokenType::Amp, 1); return self; },
+            b'(' => { self.handle_token_creation(TokenType::LParen, 1); return; },
+            b')' => { self.handle_token_creation(TokenType::RParen, 1); return; },
+            b'{' => { self.handle_token_creation(TokenType::LBrace, 1); return; },
+            b'}' => { self.handle_token_creation(TokenType::RBrace, 1); return; },
+            b'#' => { self.handle_token_creation(TokenType::Hash, 1); return; },
+            b',' => { self.handle_token_creation(TokenType::Coma, 1); return; },
+            b':' => { self.handle_token_creation(TokenType::Colon, 1); return; },
+            b'!' => { self.handle_token_creation(TokenType::Bang, 1); return; },
+            b'@' => { self.handle_token_creation(TokenType::At, 1); return; },
+            b'$' => { self.handle_token_creation(TokenType::Dollar, 1); return; },
+            b'&' => { self.handle_token_creation(TokenType::Amp, 1); return; },
             _ => ()
         }
 
@@ -85,7 +97,7 @@ impl<'a> LexMachine<'a>
         {
             //find first non-ident character 
             let mut word_end = 1;
-            while Self::is_valid_ident_char(self.to_lex[word_end], false)
+            while word_end < self.to_lex.len() && Self::is_valid_ident_char(self.to_lex[word_end], false)
             {
                 word_end += 1;
             }
@@ -101,7 +113,7 @@ impl<'a> LexMachine<'a>
                 _ => self.handle_token_creation(TokenType::Ident, word_end)
             }
 
-            return self;
+            return;
         }
 
         //buffer number case
@@ -109,7 +121,7 @@ impl<'a> LexMachine<'a>
         {
             //find first non-digit character 
             let mut word_end = 1;
-            while self.to_lex[0].is_ascii_digit()
+            while word_end < self.to_lex.len() && self.to_lex[word_end].is_ascii_digit()
             {
                 word_end += 1;
             }
@@ -117,11 +129,10 @@ impl<'a> LexMachine<'a>
             //create token
             self.handle_token_creation(TokenType::Num, word_end);
 
-            return self;
+            return;
         }
 
-        self.msgs.addMsg(Msg::new_from_lex_machine(MsgType::LexNoTokenFound, self));
-        return self;
+        self.msgs.add_msg(Msg::new_from_lex_machine(MsgType::LexNoTokenFound, self));
     }
 
     fn handle_token_creation(&mut self, t:TokenType, consume:usize)
@@ -138,22 +149,17 @@ impl<'a> LexMachine<'a>
     }
 
     fn handle_next_whitespace(&mut self)
-    {
-        if self.to_lex.len() == 0
-        {
-            return;
-        }
-        
-        while self.to_lex[0] == b' ' || self.to_lex[0] == b'\n'
+    {   
+        while self.to_lex.len() != 0 && ( self.to_lex[0] == b' ' || self.to_lex[0] == b'\n' )
         {
             self.offset += 1;
             self.col += 1;
-            self.to_lex = &self.to_lex[1..];
             if self.to_lex[0] == b'\n'
             {
                 self.col = 0;
                 self.row += 1;
             }
+            self.to_lex = &self.to_lex[1..];
         }
     }
 
@@ -171,9 +177,9 @@ impl Msg
     }
 }
 
-pub fn test()
+pub fn lex(input:&[u8]) -> Vec<Token>
 {
-    let mut m = &mut LexMachine::new(b"]");
-    m = m.lex_next_token();
-    println!("{:?}", m);
+    let mut m = LexMachine::new(input);
+    m.lex_all();
+    m.tokens
 }
