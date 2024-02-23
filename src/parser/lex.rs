@@ -22,7 +22,8 @@ pub enum TokenType
     At,
     Dollar,
     Amp,
-    Add
+    Add,
+    Eof
 }
 
 #[derive(Debug)]
@@ -177,9 +178,9 @@ impl Msg
     }
 }
 
-pub fn lex(input:&[u8]) -> Vec<Token>
+pub fn lex(input:&[u8]) -> (Vec<Token>, MsgLog)
 {
     let mut m = LexMachine::new(input);
     m.lex_all();
-    m.tokens
+    (m.tokens, m.msgs)
 }

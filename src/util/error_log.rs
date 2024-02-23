@@ -3,6 +3,7 @@ pub enum MsgType
 {
     LexNoTokenFound,
     LexAttemptedToRunOffEndOfInput,
+    ParseWrongTokenInRootParse,
 }
 
 #[derive(Debug)]
@@ -45,3 +46,4 @@ impl Msg
         Msg {typ:m, offset:offset, row:row, col:col}
     }
 }
+
