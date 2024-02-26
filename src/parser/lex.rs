@@ -4,7 +4,7 @@ use crate::util::error_log::{
     MsgType
 };
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum TokenType
 {
     Dat,
@@ -26,14 +26,14 @@ pub enum TokenType
     Eof
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Token<'a>
 {
-    typ:TokenType,
-    lexeme:& 'a [u8],
-    offset:usize,
-    row:usize,
-    col:usize
+    pub typ:TokenType,
+    pub lexeme:& 'a [u8],
+    pub offset:usize,
+    pub row:usize,
+    pub col:usize
 }
 
 #[derive(Debug)]
@@ -51,7 +51,7 @@ impl<'a> LexMachine<'a>
 {
     fn new(input:& 'a [u8]) -> LexMachine<'a>
     {
-        let mut machine = LexMachine {to_lex: input, tokens: Vec::new(), offset: 0, row: 0, col: 0, msgs: MsgLog::new()};
+        let mut machine = LexMachine {to_lex: input, tokens: Vec::new(), offset: 0, row: 0, col: 0, msgs: MsgLog::new(input)};
         machine.handle_next_whitespace();
         machine
     }
@@ -90,6 +90,7 @@ impl<'a> LexMachine<'a>
             b'@' => { self.handle_token_creation(TokenType::At, 1); return; },
             b'$' => { self.handle_token_creation(TokenType::Dollar, 1); return; },
             b'&' => { self.handle_token_creation(TokenType::Amp, 1); return; },
+            b'w' => { self.handle_token_creation(TokenType::W, 1); return; },
             _ => ()
         }
 

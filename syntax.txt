@@ -1,5 +1,6 @@
 root = data root?
      = function root?
+     = label root?
 data = DAT W NUM NUM
 function = fn_name (W NUM)? L_PAREN param_list? R_PARAM L_BRACE body? R_BRACE
 fn_name = HASH IDENT

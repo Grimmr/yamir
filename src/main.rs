@@ -3,5 +3,5 @@ mod util;
 
 fn main()
 {
-    println!("{:?}", parser::lex::lex(b"hello\n23 "));
+    println!("{:?}", parser::parser::parse_from_bytes(b"dat w 1 25"));
 }

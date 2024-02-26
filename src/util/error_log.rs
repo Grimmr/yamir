@@ -1,9 +1,21 @@
+use crate::parser::lex::{
+    Token
+};
+
 #[derive(Debug)]
 pub enum MsgType
 {
-    LexNoTokenFound,
+    //F
+    MsgLogAttemptToRenderParseErrorWithNoTokenInput,
     LexAttemptedToRunOffEndOfInput,
+    ParseConsumedTokenWithoutLookingFirst,
+
+    //E
+    LexNoTokenFound,
     ParseWrongTokenInRootParse,
+    ParseDatStatementMissingWKeyword,
+    ParseDatStatementMissingNum{missing_count:u8},
+    ParseNumHasInvalidLexeme
 }
 
 #[derive(Debug)]
@@ -23,7 +35,7 @@ pub struct MsgLog
 
 impl MsgLog
 {
-    pub fn new() -> MsgLog
+    pub fn new(input:&[u8]) -> MsgLog
     {
         MsgLog {msgs: Vec::new()}
     }
